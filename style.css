@@ -1,0 +1,243 @@
+<script>
+  import { onMount } from 'svelte';
+
+  let startMenuOpen = false;
+
+  let windows = [
+    {
+      id: 'mediaPlayer',
+      title: 'Media Player',
+      content: 'media',
+      src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+      type: 'audio',
+      x: 100,
+      y: 100,
+      visible: false
+    },
+    {
+      id: 'videoPlayer',
+      title: 'Video Player',
+      content: 'video',
+      src: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
+      type: 'video',
+      x: 150,
+      y: 150,
+      visible: false
+    },
+    {
+      id: 'paint',
+      title: 'LightBrush Paint',
+      content: 'iframe',
+      src: 'https://lightbrush.art/paint',
+      x: 200,
+      y: 200,
+      visible: false
+    }
+    // Add more apps here
+  ];
+
+  let dragWindow = null;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  function toggleStartMenu() {
+    startMenuOpen = !startMenuOpen;
+  }
+
+  function openWindow(win) {
+    win.visible = true;
+    win.z = Date.now();
+  }
+
+  function closeWindow(win) {
+    win.visible = false;
+  }
+
+  function mouseDown(win, e) {
+    dragWindow = win;
+    offsetX = e.clientX - win.x;
+    offsetY = e.clientY - win.y;
+  }
+
+  function mouseMove(e) {
+    if (dragWindow) {
+      dragWindow.x = e.clientX - offsetX;
+      dragWindow.y = e.clientY - offsetY;
+    }
+  }
+
+  function mouseUp() {
+    dragWindow = null;
+  }
+
+  onMount(() => {
+    window.addEventListener('mousemove', mouseMove);
+    window.addEventListener('mouseup', mouseUp);
+  });
+</script>
+
+<style>
+  @import url('https://use.typekit.net/xxxxxxx.css'); /* Segoe UI Light */
+
+  :global(body) {
+    margin: 0;
+    font-family: 'Segoe UI Light', 'Segoe UI', sans-serif;
+    background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4k5t89A49b_xXiP_tEvmAl6azlCgaw6OG6A&s') no-repeat center center fixed;
+    background-size: cover;
+    overflow: hidden;
+  }
+
+  .taskbar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 48px;
+    background: rgba(50, 50, 50, 0.85);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    z-index: 1000;
+  }
+
+  .start-button {
+    width: 36px;
+    height: 36px;
+    background: url('https://i.namu.wiki/i/Q6w344sEJTFQ1knhHS9whpmSUfYn11SKwIuhcwbidm03Ci_-GKXuQjEvgRl1HyX8EfnOEUp4erRNlPKUtGg4Dg.svg') no-repeat center/contain;
+    cursor: pointer;
+  }
+
+  .start-menu {
+    position: fixed;
+    bottom: 48px;
+    left: 10px;
+    width: 320px;
+    background: rgba(240, 240, 240, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    z-index: 999;
+  }
+
+  .app {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .app img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 5px;
+  }
+
+  .window {
+    position: absolute;
+    background: rgba(255,255,255,0.95);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    z-index: 500;
+  }
+
+  .window-header {
+    height: 32px;
+    background: rgba(200,200,200,0.9);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    cursor: move;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 4px;
+  }
+
+  .buttons div {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    background: #ff5f57;
+    cursor: pointer;
+  }
+
+  .buttons .minimize {
+    background: #ffbd2e;
+  }
+
+  .buttons .maximize {
+    background: #28c940;
+  }
+
+  .window-content {
+    flex: 1;
+    padding: 10px;
+    overflow: auto;
+  }
+
+  video, audio, iframe {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<div class="taskbar">
+  <div class="start-button" on:click={toggleStartMenu}></div>
+</div>
+
+{#if startMenuOpen}
+  <div class="start-menu">
+    {#each windows as win}
+      <div class="app" on:click={() => openWindow(win)}>
+        {#if win.type === 'audio'}🎵{/if}
+        {#if win.type === 'video'}🎬{/if}
+        {#if win.type === 'iframe'}🎨{/if}
+        <span>{win.title}</span>
+      </div>
+    {/each}
+  </div>
+{/if}
+
+{#each windows as win (win.id)}
+  {#if win.visible}
+    <div
+      class="window"
+      style="top:{win.y}px; left:{win.x}px; width:400px; height:300px; z-index:{win.z || 500};"
+    >
+      <div class="window-header" on:mousedown={(e) => mouseDown(win,e)}>
+        <span>{win.title}</span>
+        <div class="buttons">
+          <div class="minimize" on:click={() => win.visible=false}></div>
+          <div class="maximize"></div>
+          <div class="close" on:click={() => closeWindow(win)}></div>
+        </div>
+      </div>
+      <div class="window-content">
+        {#if win.type === 'audio'}
+          <audio controls>
+            <source src={win.src} type="audio/mpeg" />
+          </audio>
+        {/if}
+        {#if win.type === 'video'}
+          <video controls>
+            <source src={win.src} type="video/mp4" />
+          </video>
+        {/if}
+        {#if win.type === 'iframe'}
+          <iframe src={win.src}></iframe>
+        {/if}
+      </div>
+    </div>
+  {/if}
+{/each}
