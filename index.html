@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 11 Clone</title>
+    <!-- Adobe Fonts for Segoe UI Light -->
+    <link rel="stylesheet" href="https://use.typekit.net/xxxxxxx.css">
+    <style>
+        /* General reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI Light', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4k5t89A49b_xXiP_tEvmAl6azlCgaw6OG6A&s') no-repeat center center fixed;
+            background-size: cover;
+            overflow: hidden;
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 48px;
+            background: rgba(50, 50, 50, 0.85);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            z-index: 1000;
+        }
+
+        .start-button {
+            width: 36px;
+            height: 36px;
+            background: url('https://i.namu.wiki/i/Q6w344sEJTFQ1knhHS9whpmSUfYn11SKwIuhcwbidm03Ci_-GKXuQjEvgRl1HyX8EfnOEUp4erRNlPKUtGg4Dg.svg') no-repeat center/contain;
+            cursor: pointer;
+        }
+
+        /* Start Menu */
+        .start-menu {
+            position: fixed;
+            bottom: 48px;
+            left: 10px;
+            width: 320px;
+            background: rgba(240, 240, 240, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            padding: 15px;
+            display: none;
+            flex-wrap: wrap;
+            z-index: 999;
+        }
+
+        .start-menu .app {
+            width: 60px;
+            height: 60px;
+            margin: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .start-menu .app img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 5px;
+        }
+
+        .start-menu .app span {
+            font-size: 10px;
+            text-align: center;
+        }
+
+        /* Window styling */
+        .window {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            width: 400px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            z-index: 500;
+        }
+
+        .window-header {
+            height: 32px;
+            background: rgba(200, 200, 200, 0.9);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            cursor: move;
+        }
+
+        .window-header .buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .window-header .buttons div {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+            background: #ff5f57; /* close default red */
+            cursor: pointer;
+        }
+
+        .window-header .buttons .minimize {
+            background: #ffbd2e;
+        }
+
+        .window-header .buttons .maximize {
+            background: #28c940;
+        }
+
+        .window-content {
+            flex: 1;
+            padding: 10px;
+            overflow: auto;
+        }
+
+        /* Media player/video */
+        video, audio {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* LightBrush iframe */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button" id="startBtn"></div>
+    </div>
+
+    <!-- Start Menu -->
+    <div class="start-menu" id="startMenu">
+        <!-- Sample 50 apps -->
+        <div class="app" data-app="mediaPlayer">
+            <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Media Player">
+            <span>Media Player</span>
+        </div>
+        <div class="app" data-app="videoPlayer">
+            <img src="https://cdn-icons-png.flaticon.com/512/727/727247.png" alt="Video Player">
+            <span>Video Player</span>
+        </div>
+        <div class="app" data-app="paint">
+            <img src="https://cdn-icons-png.flaticon.com/512/182/182222.png" alt="Paint">
+            <span>Paint</span>
+        </div>
+        <!-- Add more apps here up to 50 -->
+    </div>
+
+    <!-- Windows -->
+    <div class="window" id="mediaPlayer" style="display:none;">
+        <div class="window-header">
+            <span>Media Player</span>
+            <div class="buttons">
+                <div class="minimize"></div>
+                <div class="maximize"></div>
+                <div class="close"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <audio controls>
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            </audio>
+        </div>
+    </div>
+
+    <div class="window" id="videoPlayer" style="display:none;">
+        <div class="window-header">
+            <span>Video Player</span>
+            <div class="buttons">
+                <div class="minimize"></div>
+                <div class="maximize"></div>
+                <div class="close"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <video controls>
+                <source src="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <div class="window" id="paint" style="display:none;">
+        <div class="window-header">
+            <span>LightBrush Paint</span>
+            <div class="buttons">
+                <div class="minimize"></div>
+                <div class="maximize"></div>
+                <div class="close"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <iframe src="https://lightbrush.art/paint" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Start menu toggle
+        const startBtn = document.getElementById('startBtn');
+        const startMenu = document.getElementById('startMenu');
+        startBtn.addEventListener('click', () => {
+            startMenu.style.display = startMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // App windows
+        const apps = document.querySelectorAll('.app');
+        apps.forEach(app => {
+            app.addEventListener('click', () => {
+                const win = document.getElementById(app.dataset.app);
+                win.style.display = 'flex';
+                win.style.zIndex = 600;
+            });
+        });
+
+        // Window buttons
+        const windows = document.querySelectorAll('.window');
+        windows.forEach(win => {
+            const closeBtn = win.querySelector('.close');
+            closeBtn.addEventListener('click', () => win.style.display = 'none');
+        });
+
+        // Draggable windows
+        let activeWindow = null;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        windows.forEach(win => {
+            const header = win.querySelector('.window-header');
+            header.addEventListener('mousedown', (e) => {
+                activeWindow = win;
+                offsetX = e.clientX - win.offsetLeft;
+                offsetY = e.clientY - win.offsetTop;
+            });
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if(activeWindow) {
+                activeWindow.style.left = (e.clientX - offsetX) + 'px';
+                activeWindow.style.top = (e.clientY - offsetY) + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            activeWindow = null;
+        });
+    </script>
+</body>
+</html>
